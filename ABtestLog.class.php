@@ -20,9 +20,11 @@ class ABtestLog {
 
     public static function dump() {
         if ( empty(self::$log)) {
-	    return "end";
+	    return "";
         }else {
-            return "abtest:" . implode("_", sort(array_keys(self::$log))). "end";
+	    $segHits = array_keys(self::$log);
+	    sort($segHits);
+            return "abtest:" . implode("_", $segHits);
         }
     }
 

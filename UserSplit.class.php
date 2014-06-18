@@ -70,14 +70,9 @@ class UserSplit {
 
         $layer = self::$conf[$layerName];
         $buf = $layer['hashcode'] . $tag;
-	# echo "buf=". $buf;
-	echo "tag=". $tag;
-	echo "\n";
-	echo "hex=". hexdec(substr(md5($buf), -10, 10));
-	echo "\n";
+
 	# md5字符串太长，hexdec得到浮点数
         $residual = hexdec(substr(md5($buf), -10, 10)) % self::$hashResidual;
-	echo "residual=".$residual."\n";
 
         $this->split_string = "";
         $segments = $layer['segment'];

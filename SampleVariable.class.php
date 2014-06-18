@@ -39,8 +39,8 @@ class SampleVariable {
             $layer = $vars['layer'];
             $condition = $vars['condition'];
             $seg2val = array();
-            foreach ($condition as $segName => $val) {
-                $seg2val[$segName] = $val;
+            foreach ($condition as $pair) {
+                $seg2val[$pair['segment']] = $pair['value'];
             }
 
             $res[$name] = array(
@@ -48,6 +48,7 @@ class SampleVariable {
                 'layer'   => $layer,
                 'condition' => $seg2val);
         }
+	
         return $res;
     }
 
@@ -102,6 +103,7 @@ class SampleVariable {
      */
     public function getSV($name, $splitString) {
         $segNames = explode('_', trim($splitString));
+
         $sv = self::$conf[$name];
         $seg2val = $sv['condition'];
 
