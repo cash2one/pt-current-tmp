@@ -10,7 +10,7 @@ class UserSplit {
     # 用户切分的最大区间
     private static $hashResidual = 100;
     # 全局唯一的配置文件路径
-    private static $yamlFile = "";
+    private static $yamlFile = "user_splitter.json";
     # 配置文件内容
     private static $conf;
     # singleton
@@ -19,9 +19,10 @@ class UserSplit {
     # 命中用户切分的字符串，类似 A1_B3_C1
     private $split_string = "";
 
-    function _construct() {
+    function __construct() {
         # yaml related: http://www.php.net/manual/en/yaml.examples.php
-        $yaml = yaml_parse(file_get_contents(self::$yamlFile));
+        # $yaml = yaml_parse(file_get_contents(self::$yamlFile));
+        $yaml = json_decode(file_get_contents(self::$yamlFile), true);
         self::$conf = self::mapYaml2Kv($yaml);
     }
 
@@ -36,14 +37,17 @@ class UserSplit {
         foreach ($yaml as $layer) {
             $layerName = $layer['layer'];
             $hashCode = $layer['hashcode'];
-            $res[$layerName] = array('hashcode' => $hashCode);
+            $res[$layerName] = array(
+				     'hashcode' => $hashCode,
+				     'segment' => array());
             foreach ($layer['segment'] as $segment) {
                 $segName = $segment['name'];
                 $start = $segment['start'];
                 $end = $segment['end'];
-                $res[$layerName]['segment'] = array($segName, $start, $end);
+                $res[$layerName]['segment'][] = array($segName, $start, $end);
             }
         }
+
 
         return $res;
     }
@@ -66,15 +70,23 @@ class UserSplit {
 
         $layer = self::$conf[$layerName];
         $buf = $layer['hashcode'] . $tag;
-        $residual = hexdec(md5($buf)) % self::$hashResidual;
+	# echo "buf=". $buf;
+	echo "tag=". $tag;
+	echo "\n";
+	echo "hex=". hexdec(substr(md5($buf), -10, 10));
+	echo "\n";
+	# md5字符串太长，hexdec得到浮点数
+        $residual = hexdec(substr(md5($buf), -10, 10)) % self::$hashResidual;
+	echo "residual=".$residual."\n";
 
         $this->split_string = "";
         $segments = $layer['segment'];
+	
         foreach ($segments as $seg) {
             list($name, $start, $end) = $seg;
             if ($residual < $end) {
                 if ($start <= $residual) {
-                    $this->split_string =  $name;
+                    $this->split_string = $name;
                     return $name;
                 }else {
                     return "";

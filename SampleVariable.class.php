@@ -6,18 +6,23 @@
  * Time: 下午10:14
  */
 
+require_once("UserSplit.class.php");
+
+
 class SampleVariable {
     # 全局唯一的配置文件路径
-    private static $yamlFile = "TODO";
+    private static $yamlFile = "sample_variable.json";
     # 配置内容
     private static $conf;
     # singleton
     private static $instance;
 
 
-    function _construct() {
+    function __construct() {
         # yaml related: http://www.php.net/manual/en/yaml.examples.php
-        $yaml = yaml_parse(file_get_contents(self::$yamlFile));
+        # $yaml = yaml_parse(file_get_contents(self::$yamlFile));
+        # 线上php没有yaml扩展，先用json做配置
+        $yaml = json_decode(file_get_contents(self::$yamlFile), true);
         self::$conf = self::mapYaml2Kv($yaml);
     }
 

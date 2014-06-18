@@ -6,6 +6,9 @@
  * Time: 上午10:51
  */
 
+require_once("SampleVariable.class.php");
+require_once("ABtestLog.class.php");
+
 
 $sv = SampleVariable::instance();
 
@@ -14,13 +17,23 @@ $sv = SampleVariable::instance();
  * $close_alipay = $sv->getSVInMob("close_alipay");
  */
 
-$userInfo = array("user_id" => $_REQUEST['user_id']);
+$fh = fopen('tmp.user_id', 'r');
+while (!feof($fh)) {
+  
+  $line = fgets($fh);
+  $user_id = trim($line);
+  # $userInfo = array("user_id" => $_REQUEST['user_id']);
+  # $userInfo = array("user_id" => '0000242342042342');
+  $userInfo = array('user_id' => trim($line));
+  $close_alipay = $sv->getSVWithUserInfo("close_alipay", $userInfo);
+  $swap_fguide = $sv->getSVWithUserInfo("swap_fguide", $userInfo);
 
-$close_alipay = $sv->getSVWithUserInfo("close_alipay", $userInfo);
+  echo $user_id."\t".$close_alipay."\t".$swap_fguide."\t".ABtestLog::dump()."\n";
+  ABtestLog::clear();
 
-
-if($close_alipay) {
-    do_close_alipay();
-}else {
-    do_open_alipay();
 }
+
+fclose($fh);
+
+  
+

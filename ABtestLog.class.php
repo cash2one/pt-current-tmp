@@ -8,6 +8,10 @@
 
 class ABtestLog {
 
+    /*
+     *  生成的日志形如： abtest:A1_B2, 最为mobsnake日志ext_logs中的一个kv。
+     */
+
     private static $log = array();
 
     public static function write($segment) {
@@ -15,7 +19,15 @@ class ABtestLog {
     }
 
     public static function dump() {
-        return "abtest=" . implode("_", sort(array_keys(self::$log)));
+        if ( empty(self::$log)) {
+	    return "end";
+        }else {
+            return "abtest:" . implode("_", sort(array_keys(self::$log))). "end";
+        }
+    }
+
+    public static function clear() {
+        self::$log = array();
     }
 
 } 
